@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歷史小測驗：古代民族互動與文化交流</title>
+    <style>
+        body {
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        .meta-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #eef2f5;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            font-size: 0.95em;
+            color: #34495e;
+            font-weight: bold;
+        }
+        .question-card {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .question-title {
+            font-size: 1.15em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #34495e;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 4px;
+            background: #fff;
+            border: 1px solid #dcdde1;
+            transition: background 0.2s;
+        }
+        .options label:hover {
+            background: #eef2f5;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        .btn-container {
+            text-align: right;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1em;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .explanation {
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+            font-size: 0.95em;
+            display: none;
+            white-space: pre-line;
+        }
+        #result-container {
+            text-align: center;
+            display: none;
+        }
+        #result-score {
+            font-size: 1.4em;
+            color: #e67e22;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .review-item {
+            text-align: left;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            background: #fafafa;
+            border: 1px solid #ddd;
+        }
+        .leaderboard-box {
+            background: #fffdf4;
+            border: 1px solid #f39c12;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        .leaderboard-box h3 {
+            margin-top: 0;
+            color: #d35400;
+            font-size: 1.2em;
+        }
+        .leaderboard-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .leaderboard-list li {
+            padding: 6px 0;
+            border-bottom: 1px dashed #eee;
+            font-size: 0.95em;
+        }
+        .name-input-box {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .name-input-box input {
+            padding: 8px 12px;
+            font-size: 1em;
+            width: 50%;
+            max-width: 220px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>歷史小測驗：古代民族互動與文化交流</h1>
+    
+    <!-- 頂部資訊列：進度與即時計時 -->
+    <div class="meta-info">
+        <span id="progress-text">第 1 題 / 共 20 題</span>
+        <span id="timer-text">⏱️ 00:00</span>
+    </div>
+    
+    <div id="quiz-container">
+        <!-- 單題區塊 -->
+        <div class="question-card" id="current-card">
+            <div class="question-title" id="q-title"></div>
+            <div class="options" id="q-options"></div>
+            <div class="explanation" id="q-exp"></div>
+            <div class="btn-container">
+                <button id="action-btn" onclick="handleBtnClick()">確定送出</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-container">
+        <h2>測驗結算</h2>
+        <div id="result-score"></div>
+        
+        <!-- 排行榜儲存區塊 -->
+        <div class="name-input-box" id="save-score-section">
+            <label for="player-name"><strong>輸入你的大名登錄排行榜：</strong></label><br><br>
+            <input type="text" id="player-name" placeholder="請輸入您的姓名">
+            <button onclick="saveToLeaderboard()" style="width: auto; padding: 8px 20px;">送出成績</button>
+        </div>
+
+        <!-- 英雄排行榜 -->
+        <div class="leaderboard-box">
+            <h3>🏆 英雄排行榜（最高分優先，同分比速度）</h3>
+            <ul class="leaderboard-list" id="leaderboard-list">
+                <li>尚無紀錄</li>
+            </ul>
+        </div>
+
+        <div id="review-list"></div>
+        <button onclick="restartQuiz()" style="margin-top: 20px;">重新測驗</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            title: "1. 秦國統一後，將各國所建長城連接以防禦哪一個北方遊牧民族？",
+            options: ["A. 吐蕃", "B. 匈奴", "C. 鮮卑", "D. 大食"],
+            answer: 1,
+            exp: "• 正確答案 (B) 匈奴：東周及秦漢時期，黃河流域各國與秦朝主要是為了防禦北方興起的匈奴而修築長城。\n• 錯點指正：A. 吐蕃位於西藏；C. 鮮卑活躍於魏晉南北朝；D. 大食指阿拉伯帝國。"
+        },
+        {
+            title: "2. 漢武帝為了對抗匈奴，派遣誰出使西域，從而促成了「絲路」貿易的活絡？",
+            options: ["A. 張騫", "B. 玄奘", "C. 唐太宗", "D. 北魏孝文帝"],
+            answer: 0,
+            exp: "• 正確答案 (A) 張騫：漢武帝派張騫出使西域，增進漢人對西域認識，使西域貿易活絡並促成「絲路」。\n• 錯點指正：B. 玄奘是唐代取經僧人；C. 唐太宗為唐代君主；D. 北魏孝文帝推行漢化。"
+        },
+        {
+            title: "3. 漢代末年，北方草原民族續向南遷至黃河流域，被漢人通稱為甚麼？",
+            options: ["A. 番", "B. 蠻", "C. 胡", "D. 狄"],
+            answer: 2,
+            exp: "• 正確答案 (C) 胡：漢代末年北方草原民族南遷至黃河流域，被漢人通稱為「胡」。\n• 錯點指正：A、B、D 分別為古代對其他周邊民族的稱呼。"
+        },
+        {
+            title: "4. 西晉末年爆發哪一場戰亂，導致大批漢人隨晉室南遷，加速了南方開發？",
+            options: ["A. 安史之亂", "B. 怛羅斯之役", "C. 永嘉之禍", "D. 大化改新"],
+            answer: 2,
+            exp: "• 正確答案 (C) 永嘉之禍：西晉永嘉5年（311年）胡族攻進洛陽，史稱「永嘉之禍」，促使晉室流亡江南。\n• 錯點指正：A. 安史之亂在唐代；B. 怛羅斯之役為唐代與大食之戰；D. 大化改新在日本。"
+        },
+        {
+            title: "5. 鮮卑族君主北魏孝文帝為了推行漢化，將首都從哪裡南遷到洛陽？",
+            options: ["A. 長安", "B. 建康", "C. 鄴城", "D. 平城"],
+            answer: 3,
+            exp: "• 正確答案 (D) 平城：北魏孝文帝將首都從平城（今山西大同）南遷到洛陽。\n• 錯點指正：A、B、C 皆非北魏遷都前的起點。"
+        },
+        {
+            title: "6. 北魏孝文帝推行漢化運動的內容，下列何者錯誤？",
+            options: ["A. 嚴禁胡漢通婚", "B. 說漢語", "C. 穿漢服", "D. 改漢姓"],
+            answer: 0,
+            exp: "• 正確答案 (A) 嚴禁胡漢通婚：孝文帝為了促進胡漢融合，反而是「鼓勵」胡漢通婚，故 A 錯誤。\n• 錯點指正：B、C、D 均為孝文帝推行的正確漢化政策。"
+        },
+        {
+            title: "7. 唐太宗滅東突厥後，西北各族君長尊稱他為什麼，使唐帝國成為東亞秩序的盟主？",
+            options: ["A. 可汗", "B. 天可汗", "C. 君子王", "D. 大皇帝"],
+            answer: 1,
+            exp: "• 正確答案 (B) 天可汗：唐太宗滅東突厥後，西北各族君長尊稱其為「天可汗」，意為普天下的君王。\n• 錯點指正：A. 「可汗」為一般稱號；C、D 均非史書記載之尊稱。"
+        },
+        {
+            title: "8. 下列哪一個國家在 7 世紀統一朝鮮半島，因全力模仿中國文化而被稱為「君子國」？",
+            options: ["A. 日本", "B. 吐蕃", "C. 新羅", "D. 大食"],
+            answer: 2,
+            exp: "• 正確答案 (C) 新羅：新羅在 7 世紀統一朝鮮半島，全力模仿中國文化，有「君子國」之稱。\n• 錯點指正：A. 日本進行大化改新；B. 吐蕃位於西藏；D. 大食指阿拉伯帝國。"
+        },
+        {
+            title: "9. 日本在唐代多次派使節到中國學習，7世紀中葉發動以唐代制度為藍本的革新運動稱為？",
+            options: ["A. 明治維新", "B. 孝文帝改革", "C. 戊戌變法", "D. 大化改新"],
+            answer: 3,
+            exp: "• 正確答案 (D) 大化改新：日本為建立天皇集權國家，以唐代制度為藍本展開「大化改新」。\n• 錯點指正：A. 明治維新為近代日本改革；B. 孝文帝改革在中國北魏；C. 戊戌變法在清末。"
+        },
+        {
+            title: "10. 唐太宗將哪一位公主嫁到吐蕃（今西藏），宣揚佛教並帶入農業技術？",
+            options: ["A. 文成公主", "B. 王昭君", "C. 武則天", "D. 太平公主"],
+            answer: 0,
+            exp: "• 正確答案 (A) 文成公主：唐太宗將文成公主嫁到吐蕃，宣揚佛教並將農業技術帶入西藏。\n• 錯點指正：B. 王昭君是漢代和親人物；C、D 為唐代女政治家/皇族。"
+        },
+        {
+            title: "11. 中國的造紙術是因為唐代哪一場戰役中，唐軍戰敗士兵被俘而西傳？",
+            options: ["A. 長平之戰", "B. 怛羅斯之役", "C. 淝水之戰", "D. 赤壁之戰"],
+            answer: 1,
+            exp: "• 正確答案 (B) 怛羅斯之役：唐軍與大食交戰於怛羅斯戰敗，造紙工匠被俘，使造紙術西傳。\n• 錯點指正：A、C、D 皆為中國內戰或早期戰役。"
+        },
+        {
+            title: "12. 佛教起源於哪裡，大約在漢代（西元1世紀左右）傳入中國？",
+            options: ["A. 西域", "B. 阿拉伯", "C. 印度", "D. 日本"],
+            answer: 2,
+            exp: "• 正確答案 (C) 印度：佛教起源於印度，早期在西域流行，漢代傳入中國。\n• 錯點指正：A. 西域是中繼站；B. 阿拉伯與伊斯蘭教有關；D. 日本非佛教發源地。"
+        },
+        {
+            title: "13. 魏晉南北朝時期，佛教之所以廣為流傳，下列原因何者錯誤？",
+            options: ["A. 人民遘受戰亂之苦，宗教成為精神寄託", "B. 帝王提倡", "C. 佛經翻譯等因素", "D. 當時政府明文規定全國軍民必須強制信仰"],
+            answer: 3,
+            exp: "• 正確答案 (D) 當時政府明文規定全國軍民必須強制信仰：佛教大流行是因為戰亂精神寄託、帝王提倡與佛經翻譯，並非政府強制規定。\n• 錯點指正：A、B、C 均為真實原因。"
+        },
+        {
+            title: "14. 唐初哪一位高僧前往印度取經，回國後主持佛經翻譯，進一步促進佛教中國化？",
+            options: ["A. 玄奘", "B. 張騫", "C. 鑑真", "D. 慧遠"],
+            answer: 0,
+            exp: "• 正確答案 (A) 玄奘：唐初玄奘前往印度取經，回國主持佛經翻譯，促進佛教中國化。\n• 錯點指正：B. 張騫是出使西域；C、D 非本課前往印度取經人物。"
+        },
+        {
+            title: "15. 除了佛教之外，哪一個宗教也在唐代傳入中國，展現出宗教多元的風貌？",
+            options: ["A. 基督教", "B. 伊斯蘭教", "C. 印度教", "D. 道教"],
+            answer: 1,
+            exp: "• 正確答案 (B) 伊斯蘭教：伊斯蘭教也在唐代傳入中國，展現宗教多元風貌。\n• 錯點指正：A. 基督教雖唐代曾傳入但課文強調伊斯蘭教；C. 印度教非重點；D. 道教為本土宗教。"
+        },
+        {
+            title: "16. 唐代的首都位於哪裡，當時胡商雲集，西域文化盛行？",
+            options: ["A. 洛陽", "B. 平城", "C. 長安（今西安）", "D. 建康"],
+            answer: 2,
+            exp: "• 正確答案 (C) 長安（今西安）：唐人生活深受西域影響，首都長安胡商雲集。\n• 錯點指正：A. 洛陽為北魏遷都之地；B. 平城為北魏舊都；D. 建康為東晉及江南首都。"
+        },
+        {
+            title: "17. 下列何者不是唐代長安城中所盛行的西域文化風貌？",
+            options: ["A. 胡食", "B. 胡服（短衣窄袖）", "C. 胡樂、胡舞", "D. 和服與木屐"],
+            answer: 3,
+            exp: "• 正確答案 (D) 和服與木屐：和服與木屐為日本文化代表，並非唐代長安盛行的西域胡風。\n• 錯點指正：A、B、C 均為課文提及之西域胡風。"
+        },
+        {
+            title: "18. 魏晉南北朝是民族融合的重要時期，其中「永嘉之禍」發生於哪一個朝代末年？",
+            options: ["A. 西晉", "B. 東晉", "C. 漢代", "D. 唐代"],
+            answer: 0,
+            exp: "• 正確答案 (A) 西晉：西晉末年爆發「永嘉之禍」，晉室流亡至南方建立東晉。\n• 錯點指正：B. 東晉是因永嘉之禍後才建立；C、D 朝代不符。"
+        },
+        {
+            title: "19. 根據課文，造紙術在漢代改良後，在下列哪一個朝代因戰爭而西傳？",
+            options: ["A. 漢代", "B. 唐代", "C. 宋代", "D. 明代"],
+            answer: 1,
+            exp: "• 正確答案 (B) 唐代：造紙術在漢代改良，但在唐代時因怛羅斯之役戰敗西傳。\n• 錯點指正：A. 漢代僅為改良；C、D 朝代錯誤。"
+        },
+        {
+            title: "20. 「漢戴胡帽，胡服漢帽」反映了古代哪一種歷史現象？",
+            options: ["A. 政治上的嚴格階級劃分", "B. 經濟重心的南移", "C. 民族文化交流與融合的體現", "D. 閉關自守的政策"],
+            answer: 2,
+            exp: "• 正確答案 (C) 民族文化交流與融合的體現：漢人戴胡帽、穿胡服，胡人也融入漢文化，是文化交流的寫照。\n• 錯點指正：A、D 與衣飾無關；B. 經濟重心南移與永嘉之禍後人口南遷有關。"
+        }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let isAnswered = false;
+    let userRecords = [];
+
+    // 計時器變數
+    let startTime = 0;
+    let timerInterval = null;
+    let elapsedTimeStr = "00:00";
+
+    const progressText = document.getElementById('progress-text');
+    const timerText = document.getElementById('timer-text');
+    const qTitle = document.getElementById('q-title');
+    const qOptions = document.getElementById('q-options');
+    const qExp = document.getElementById('q-exp');
+    const actionBtn = document.getElementById('action-btn');
+    const quizContainer = document.getElementById('quiz-container');
+    const resultContainer = document.getElementById('result-container');
+    const currentCard = document.getElementById('current-card');
+
+    function startTimer() {
+        startTime = Date.now();
+        timerInterval = setInterval(() => {
+            const delta = Math.floor((Date.now() - startTime) / 1000);
+            const mins = String(Math.floor(delta / 60)).padStart(2, '0');
+            const secs = String(delta % 60).padStart(2, '0');
+            elapsedTimeStr = `${mins}:${secs}`;
+            timerText.innerText = `⏱️ ${elapsedTimeStr}`;
+        }, 1000);
+    }
+
+    function stopTimer() {
+        clearInterval(timerInterval);
+    }
+
+    function loadQuestion() {
+        isAnswered = false;
+        const q = questions[currentIdx];
+        progressText.innerText = `第 ${currentIdx + 1} 題 / 共 ${questions.length} 題`;
+        qTitle.innerText = q.title;
+        
+        let optionsHtml = '';
+        q.options.forEach((opt, optIdx) => {
+            optionsHtml += `
+                <label id="opt-label-${optIdx}">
+                    <input type="radio" name="current_option" value="${optIdx}">
+                    ${opt}
+                </label>
+            `;
+        });
+        qOptions.innerHTML = optionsHtml;
+        qExp.style.display = "none";
+        qExp.innerText = "";
+        currentCard.style.border = "1px solid #e0e0e0";
+        actionBtn.innerText = "確定送出";
+    }
+
+    function handleBtnClick() {
+        if (!isAnswered) {
+            const selected = document.querySelector('input[name="current_option"]:checked');
+            if (!selected) {
+                alert("請先選擇一個選項！");
+                return;
+            }
+
+            const userAns = parseInt(selected.value);
+            const q = questions[currentIdx];
+            const correctAns = q.answer;
+
+            isAnswered = true;
+            
+            const labels = qOptions.querySelectorAll('label');
+            labels.forEach((label, idx) => {
+                const radio = label.querySelector('input');
+                radio.disabled = true;
+                if (idx === correctAns) {
+                    label.style.backgroundColor = "#e8f8f5";
+                    label.style.border = "1px solid #27ae60";
+                    label.style.fontWeight = "bold";
+                } else if (idx === userAns && userAns !== correctAns) {
+                    label.style.backgroundColor = "#f5b7b133";
+                    label.style.border = "1px solid #c0392b";
+                }
+            });
+
+            const isCorrect = userAns === correctAns;
+            if (isCorrect) {
+                score += 5;
+                currentCard.style.border = "2px solid #27ae60";
+            } else {
+                currentCard.style.border = "2px solid #c0392b";
+            }
+
+            userRecords.push({
+                title: q.title,
+                options: q.options,
+                userAns: userAns,
+                correctAns: correctAns,
+                isCorrect: isCorrect,
+                exp: q.exp
+            });
+
+            qExp.innerText = q.exp;
+            qExp.style.display = "block";
+
+            if (currentIdx === questions.length - 1) {
+                actionBtn.innerText = "看總成績";
+            } else {
+                actionBtn.innerText = "下一題";
+            }
+
+        } else {
+            if (currentIdx < questions.length - 1) {
+                currentIdx++;
+                loadQuestion();
+            } else {
+                stopTimer(); // 測驗結束，停止計時
+                showResult();
+            }
+        }
+    }
+
+    function showResult() {
+        quizContainer.style.display = "none";
+        document.querySelector('.meta-info').style.display = "none";
+        resultContainer.style.display = "block";
+
+        let reviewHtml = "";
+        userRecords.forEach((record, idx) => {
+            const userText = record.options[record.userAns];
+            const correctText = record.options[record.correctAns];
+
+            reviewHtml += `
+                <div class="review-item" style="border-left: 5px solid ${record.isCorrect ? '#27ae60' : '#c0392b'};">
+                    <strong>第 ${idx + 1} 題：${record.title}</strong><br>
+                    您的選擇：<span style="color: ${record.isCorrect ? '#27ae60' : '#c0392b'}; font-weight: bold;">${userText}</span> ${record.isCorrect ? '✔ (答對)' : '✖ (答錯)'}<br>
+                    ${!record.isCorrect ? `正確答案：<span style="color: #27ae60; font-weight: bold;">${correctText}</span><br>` : ''}
+                    <div style="margin-top: 8px; padding: 8px; background: #e8f4f8; border-radius: 4px; font-size: 0.9em; white-space: pre-line;">
+                        <strong>💡 解析：</strong><br>${record.exp}
+                    </div>
+                </div>
+            `;
+        });
+
+        document.getElementById('result-score').innerHTML = `測驗結束！總分：<span style="color: #e67e22;">${score} 分</span>（滿分 100 分） | 總花費時間：<span style="color: #2980b9;">${elapsedTimeStr}</span>`;
+        document.getElementById('review-list').innerHTML = reviewHtml;
+        loadLeaderboard();
+    }
+
+    // 排行榜功能
+    function saveToLeaderboard() {
+        const nameInput = document.getElementById('player-name').value.trim();
+        if (!nameInput) {
+            alert("請輸入您的姓名！");
+            return;
+        }
+
+        const newRecord = {
+            name: nameInput,
+            score: score,
+            timeStr: elapsedTimeStr,
+            timeSec: parseTimeToSeconds(elapsedTimeStr),
+            date: new Date().toLocaleDateString()
+        };
+
+        let leaderboard = JSON.parse(localStorage.getItem('history_u2_leaderboard') || '[]');
+        leaderboard.push(newRecord);
+
+        // 排序規則：分數高者優先；若分數相同，花費秒數少者優先
+        leaderboard.sort((a, b) => {
+            if (b.score !== a.score) {
+                return b.score - a.score;
+            }
+            return a.timeSec - b.timeSec;
+        });
+
+        // 只保留前 10 名
+        leaderboard = leaderboard.slice(0, 10);
+        localStorage.setItem('history_u2_leaderboard', JSON.stringify(leaderboard));
+
+        document.getElementById('save-score-section').style.display = "none";
+        loadLeaderboard();
+        alert("成績已成功登錄排行榜！");
+    }
+
+    function parseTimeToSeconds(str) {
+        const parts = str.split(':');
+        return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+    }
+
+    function loadLeaderboard() {
+        const listEl = document.getElementById('leaderboard-list');
+        const leaderboard = JSON.parse(localStorage.getItem('history_u2_leaderboard') || '[]');
+
+        if (leaderboard.length === 0) {
+            listEl.innerHTML = "<li>尚無英雄紀錄，快來挑戰第一名！</li>";
+            return;
+        }
+
+        let html = "";
+        leaderboard.forEach((item, index) => {
+            let medal = "";
+            if (index === 0) medal = "🥇 ";
+            else if (index === 1) medal = "🥈 ";
+            else if (index === 2) medal = "🥉 ";
+            else medal = `${index + 1}. `;
+
+            html += `<li>${medal}<strong>${item.name}</strong> - 🌟 ${item.score} 分 (⏱️ ${item.timeStr}) <span style="float:right; color:#888; font-size:0.8em;">${item.date}</span></li>`;
+        });
+        listEl.innerHTML = html;
+    }
+
+    function restartQuiz() {
+        currentIdx = 0;
+        score = 0;
+        userRecords = [];
+        quizContainer.style.display = "block";
+        document.querySelector('.meta-info').style.display = "flex";
+        resultContainer.style.display = "none";
+        document.getElementById('save-score-section').style.display = "block";
+        document.getElementById('player-name').value = "";
+        startTimer(); // 重新計時
+        loadQuestion();
+    }
+
+    // 初始化啟動計時與第一道題目
+    startTimer();
+    loadQuestion();
+</script>
+
+</body>
+</html>
+
